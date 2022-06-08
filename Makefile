@@ -1,37 +1,20 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: kbarbry <kbarbry@student.42lyon.fr>        +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/04/11 09:52:34 by kbarbry           #+#    #+#              #
-#    Updated: 2022/05/17 04:49:45 by kbarbry          ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
-BBLU 		=	\033[1;34m
+BBLU		=	\033[1;34m
 BGREEN		=	\033[1;32m
 BRED		=	\033[1;31m
-BLU 		=	\033[0;34m
-GRN 		=	\033[0;32m
-RED 		=	\033[0;31m
-RST 		=	\033[0m
+BLU			=	\033[0;34m
+GRN			=	\033[0;32m
+RED			=	\033[0;31m
+RST			=	\033[0m
 
-SRC			=	main.cpp
+SRC			=	$(shell find ./src -type f -name "*.cpp" | cut -c 3-)
+HEADER		=	$(shell find ./inc -type f -name "*.hpp" | cut -c 3-)
 
-HEAD		=	TMap.hpp		\
-				TStack.hpp		\
-				TVector.hpp
-
-OBJ			=   ${addprefix src/, ${SRC:.cpp=.o}}
-
-HEADER		=	${addprefix inc/, ${HEAD}}
+OBJ			=	${SRC:.cpp=.o}
 
 CC			=	c++
-FLAGS		=	-Wall -Werror -Wextra -std=c++98
+FLAGS		=	-Wall -Werror -Wextra -std=c++98 #-fsanitize=address -g3
 FLAGS_H		=	-Iinc/
-NAME		=	Mutant
+NAME		=	ft_containers
 
 all: ${NAME}
 .PHONY: all
@@ -56,6 +39,9 @@ print_header:
 ${NAME}: print_header ${OBJ}
 	${CC} ${FLAGS} ${FLAGS_H} ${OBJ} -o ${NAME}
 	echo "${BGREEN}[${NAME} END] :${RST}${RST} ./${NAME} ${BGREEN}\033[47G[✔]${RST}"
+
+test: all
+	./${NAME}
 
 clean:
 	rm -f ${OBJ}

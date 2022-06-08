@@ -50,13 +50,13 @@ namespace ft
 			reverse_iterator<Iter> cpy(_iter++);
 			return (cpy);
 		}
-		reference &operator*()
+		reference operator*(void)
 		{
 			Iter cpy(_iter);
 			--cpy;
 			return (*cpy);
 		}
-		pointer &operator->()
+		pointer operator->(void)
 		{
 			Iter cpy(_iter);
 			--cpy;
