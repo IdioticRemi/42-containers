@@ -6,7 +6,7 @@ namespace ft
 {
 	class output_iterator_tag {};
 	class input_iterator_tag {};
-	class forward_iterator_tag : public input_iterator_tag{};
+	class forward_iterator_tag : public input_iterator_tag {};
 	class bidirectional_iterator_tag : public forward_iterator_tag {};
 	class random_access_iterator_tag : public bidirectional_iterator_tag {};
 
@@ -53,33 +53,43 @@ namespace ft
 		typedef const T						&reference;
 		typedef random_access_iterator_tag	iterator_category;
 	};
-	
+
 	template <typename Iter>
-	typename iterator_traits<Iter>::difference_type	distance(Iter start, Iter end)
+	typename iterator_traits<Iter>::difference_type	distance(Iter start, Iter end, random_access_iterator_tag)
+	{
+		return (end - start);
+	}
+	template <typename Iter>
+	typename iterator_traits<Iter>::difference_type	distance(Iter start, Iter end, typename iterator_traits<Iter>::iterator_category)
 	{
 		typename iterator_traits<Iter>::difference_type dist = 0;
 
-		if (typeid(iterator_traits<Iter>::iterator_category) == typeid(random_access_iterator_tag))
-			dist = end - start;
-		else
-		{
-			for (start; start != end; ++start)
-				dist++;
-		}
+		for (; start != end; ++start)
+			dist++;
 		return (dist);
+	}
+	template <typename Iter>
+	typename iterator_traits<Iter>::difference_type	distance(Iter start, Iter end)
+	{
+		return distance(start, end, typename iterator_traits<Iter>::iterator_category());
 	}
 
 	template <class Iter, class Distance>
+	void	advance(Iter start, Distance dist, random_access_iterator_tag)
+	{
+		start += dist;
+	}
+	template <class Iter, class Distance>
+	void	advance(Iter start, Distance dist, typename iterator_traits<Iter>::iterator_category)
+	{
+		typename iterator_traits<Iter>::difference_type	i = 0;
+
+		for (; i < dist; ++i)
+			start++;
+	}
+	template <class Iter, class Distance>
 	void	advance(Iter start, Distance dist)
 	{
-		typename iterator_traits<Iter>::difference_type i = -1;
-
-		if (typeid(iterator_traits<Iter>::iterator_category) == typeid(random_access_iterator_tag))
-			start += dist;
-		else
-		{
-			for (i; i < dist; ++i)
-				start++;
-		}
+		return advance(start, dist, typename iterator_traits<Iter>::iterator_category());
 	}
 }

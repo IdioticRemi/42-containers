@@ -2,7 +2,6 @@ make --dry-run --keep-going --print-directory
 make: Entering directory `/Users/kbarbry/Desktop/mon_cursus_a_42/ft_containers'
 echo "\033[1;34m\033[5G========================================================================================================"
 echo "\033[1;34m\033[5G"
- 
 echo "\033[1;34m\033[5G███████╗████████╗      ██████╗ ██████╗ ███╗   ██╗████████╗ █████╗ ██╗███╗   ██╗███████╗██████╗ ███████╗"
 echo "\033[1;34m\033[5G██╔════╝╚══██╔══╝     ██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔══██╗██║████╗  ██║██╔════╝██╔══██╗██╔════╝"
 echo "\033[1;34m\033[5G█████╗     ██║        ██║     ██║   ██║██╔██╗ ██║   ██║   ███████║██║██╔██╗ ██║█████╗  ██████╔╝███████╗"
@@ -12,7 +11,10 @@ echo "\033[1;34m\033[5G╚═╝        ╚═╝╚══════╝ ╚═
 echo "\033[1;34m\033[5G"
 echo "\033[1;34m\033[5G=======================================> By kbarbry ft tjolivea <======================================="
  
-c++ -Wall -Werror -Wextra -std=c++98  -Iinc/ src/main.o -o ft_containers
+c++ -Wall -Werror -Wextra -std=c++98 -Iinc/ -c src/main.cpp -o src/main.o
+echo "\033[1;34m[ft_containers OBJ] :\033[0m src/main.o \033[1;32m\033[47G[✔]\033[0m"
+ 
+c++ -Wall -Werror -Wextra -std=c++98 -Iinc/ src/main.o -o ft_containers
 echo "\033[1;32m[ft_containers END] :\033[0m\033[0m ./ft_containers \033[1;32m\033[47G[✔]\033[0m"
  
 make: Leaving directory `/Users/kbarbry/Desktop/mon_cursus_a_42/ft_containers'

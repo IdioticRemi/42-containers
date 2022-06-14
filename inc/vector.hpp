@@ -6,7 +6,7 @@
 /*   By: kbarbry <kbarbry@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/11 10:11:06 by kbarbry           #+#    #+#             */
-/*   Updated: 2022/06/08 20:25:57 by kbarbry          ###   ########.fr       */
+/*   Updated: 2022/06/14 15:21:25 by kbarbry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ namespace ft {
 			typedef typename allocator_type::const_reference					const_reference;
 			typedef typename allocator_type::pointer							pointer;
 			typedef typename allocator_type::const_pointer						const_pointer;
-			typedef ft::vector_iterator<value_type>								iterator;
-			typedef ft::vector_iterator<const value_type>						const_iterator;
+			typedef ft::vector_iterator<value_type, vector>						iterator;
+			typedef ft::vector_iterator<const value_type, vector>				const_iterator;
 			typedef ft::reverse_iterator<iterator>								reverse_iterator;
 			typedef ft::reverse_iterator<const_iterator>						const_reverse_iterator;
 			typedef typename ft::iterator_traits<iterator>::difference_type		difference_type;
@@ -37,7 +37,7 @@ namespace ft {
 			vector(const allocator_type& alloc = allocator_type()): _alloc(alloc), _addr(nullptr), _len(0), _cap(0) {}
 			vector(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()): _alloc(alloc), _addr(nullptr), _len(0), _cap(0) { assign(n, val); }
 			template <class Iter>
-			vector(Iter first, Iter last, const allocator_type& alloc = allocator_type()): _alloc(alloc), _addr(nullptr), _len(0), _cap(0) { assign(first, last); }
+			vector(Iter first, Iter last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<Iter>::value, Iter>::type* = nullptr): _alloc(alloc), _addr(nullptr), _len(0), _cap(0) { assign(first, last); }
 			vector(const vector &cpy): _addr(nullptr), _len(0), _cap(0) { *this = cpy; }
 			~vector(void)
 			{
@@ -115,14 +115,19 @@ namespace ft {
 					throw std::out_of_range("Index is out of range.");
 				return _addr[n];
 			}
-			const_reference at(size_type n) const { return at(n); }
+			const_reference at(size_type n) const
+			{
+				if (n >= _len || n < 0)
+					throw std::out_of_range("Index is out of range.");
+				return _addr[n];
+			}
 			allocator_type	get_allocator(void)	const	{ return _alloc; }
 
 			// Modifiers
 			iterator erase (iterator position)			{ return erase(position, position + 1); }
 			iterator erase (iterator first, iterator last)
 			{
-				size_type	erased = last - first;
+				size_type	erased = ft::distance(first, last);
 				if (erased <= 0)
 					return last;
 				for (iterator it = first; it != last; it++)
@@ -141,13 +146,13 @@ namespace ft {
 				return first;
 			}
 
-			iterator insert (iterator position, const value_type& val)
+			iterator insert(iterator position, const value_type &val)
 			{
-				iterator	before = position - 1;
+				typename iterator_traits<iterator>::difference_type	index = position - begin();
 				insert(position, 1, val);
-				return (before + 1);
+				return (begin() + index);
 			}
-			void insert (iterator position, size_type n, const value_type& val)
+			void insert(iterator position, size_type n, const value_type &val)
 			{
 				size_type	qty = n;
 				size_type	index = position - begin();
@@ -157,7 +162,7 @@ namespace ft {
 					reserve(_cap == 0 ? 1 : _cap * 2);
 				if (_len > 0)
 				{
-					for (size_type i = _len - 1; i >= index; i--)
+					for (size_type i = _len - 1; i >= index && i != std::numeric_limits<size_type>::max(); i--)
 					{
 						_alloc.construct(&_addr[i + qty], _addr[i]);
 						_alloc.destroy(&_addr[i]);
@@ -168,9 +173,9 @@ namespace ft {
 				_len += qty;
 			}
 			template <class Iter>
-    		void insert (iterator position, Iter first, Iter last)
+			void insert(iterator position, Iter first, Iter last, typename ft::enable_if<!ft::is_integral<Iter>::value, Iter>::type* = nullptr)
 			{
-				size_type	qty = last - first;
+				size_type	qty = ft::distance(first, last);
 				size_type	index = position - begin();
 				if (qty <= 0)
 					return ;
@@ -178,7 +183,7 @@ namespace ft {
 					reserve(_cap == 0 ? 1 : _cap * 2);
 				if (_len > 0)
 				{
-					for (size_type i = _len - 1; i >= index; i--)
+					for (size_type i = _len - 1; i >= index && i != std::numeric_limits<size_type>::max(); i--)
 					{
 						_alloc.construct(&_addr[i + qty], _addr[i]);
 						_alloc.destroy(&_addr[i]);
@@ -198,7 +203,7 @@ namespace ft {
 			}
 
 			template <class Iter>
-			void	assign (Iter first, Iter last)
+			void	assign (Iter first, Iter last, typename ft::enable_if<!ft::is_integral<Iter>::value, Iter>::type* = nullptr)
 			{
 				clear();
 				insert(begin(), first, last);
@@ -219,12 +224,12 @@ namespace ft {
 			{
 				if (lhs.size() != rhs.size())
 					return false;
-				return equal(lhs.begin(), lhs.end(), rhs.begin());
+				return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
 			}
 			friend bool		operator!=(const vector<T> &lhs, const vector<T> &rhs)	{ return !(lhs == rhs); }
 			friend bool 	operator<(const vector<T> &lhs, const vector<T> &rhs)
 			{
-				return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+				return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 			}
 			friend bool		operator<=(const vector<T> &lhs, const vector<T> &rhs)	{ return !(lhs > rhs); }
 			friend bool		operator>(const vector<T> &lhs, const vector<T> &rhs)	{ return rhs < lhs; }
