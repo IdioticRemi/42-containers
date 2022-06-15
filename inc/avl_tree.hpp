@@ -1,25 +1,33 @@
 #pragma once
 
-#include "pair.hpp"
+#include <memory>
+#include <iostream>
+#include <algorithm>
+#include <cmath>
+#include <iomanip>
 
 template <typename T>
 class node
 {
 private:
-	int		_weight;
+	ssize_t	_height;
+
 public:
 	T		value;
 	node	*left;
 	node	*right;
-	node	*parent;
 
-	node(T value): value(value), parent(nullptr), left(nullptr), right(nullptr), _weight(0) {}
-	node(T value, node *parent): value(value), parent(parent), left(nullptr), right(nullptr), _weight(0) {}
+	node(T value): value(value), left(nullptr), right(nullptr), _height(1) {}
 
-	bool	is_root()		const { return parent == nullptr; }
-
-	void	recalcWeight()	{ _weight = (right ? right->weight() : 0) - (left ? left->weight() : 0); }
-	size_t	weight()		const { return _weight; }
+	node	*getMax() { return (right ? right->getMax() : this); }
+	node	*getMaxParent() { return ((right && right->right) ? right->getMaxParent() : this); }
+	void	updateHeight()
+	{
+		_height = 1 + std::max( (right	?	right->height()	: 0),
+								(left	?	left->height()	: 0));
+	}
+	ssize_t	height()		const { return _height; }
+	ssize_t	balance()		const { return (left ? left->height() : 0) - (right ? right->height() : 0); }
 };
 
 namespace ft
@@ -27,76 +35,130 @@ namespace ft
 	template <typename T, typename Compare, typename Alloc = std::allocator<node<T> > >
 	class avl_tree
 	{
+	public:
+		typedef	node<T>		node_type;
+
 	private:
-		node<T>	*_root;
-		Alloc	_alloc;
+		node_type	*_root;
+		Alloc		_alloc;
+
+		node_type	*insert(T value, node_type *node)
+		{
+			if (node == nullptr)
+			{
+				node_type *new_node = _alloc.allocate(1);
+				_alloc.construct(new_node, node_type(value));
+				return new_node;
+			}
+			if (node->value < value)
+				node->right = insert(value, node->right);
+			else if (node->value > value)
+				node->left = insert(value, node->left);
+			else
+				return node;
+			node->updateHeight();
+			return applyRotation(node);
+		}
+		
+		node_type	*applyRotation(node_type *node)
+		{
+			ssize_t	balanciaga = node->balance();
+			if (balanciaga > 1)
+			{
+				if (node->left && node->left->balance() < 0)
+					node->left = left_rotation(node->left);
+				return right_rotation(node);
+			}
+			if (balanciaga < -1)
+			{
+				if (node->right && node->right->balance() > 0)
+					node->right = right_rotation(node->right);
+				return left_rotation(node);
+			}
+			return node;
+		}
+
+		node_type	*left_rotation(node_type *node)
+		{
+			node_type	*rightNode = node->right;
+			node_type	*centerNode = rightNode->left;
+
+			rightNode->left = node;
+			node->right = centerNode;
+			node->updateHeight();
+			rightNode->updateHeight();
+			return rightNode;
+		}
+		node_type	*right_rotation(node_type *node)
+		{
+			node_type	*leftNode = node->left;
+			node_type	*centerNode = leftNode->right;
+
+			leftNode->right = node;
+			node->left = centerNode;
+			node->updateHeight();
+			leftNode->updateHeight();
+			return leftNode;
+		}
+
+		node_type	*remove(T value, node_type *node)
+		{
+			if (node == nullptr)
+				return nullptr;
+			if (node->value > value)
+				node->left = remove(value, node->left);
+			else if (node->value < value)
+				node->right = remove(value, node->right);
+			else
+			{
+				node_type	*tmp;
+
+				if (node->left == nullptr)
+				{
+					tmp = node->right;
+					_alloc.destroy(node);
+					_alloc.deallocate(node, 1);
+					return tmp;
+				}
+				else if (node->right == nullptr)
+				{
+					tmp = node->left;
+					_alloc.destroy(node);
+					_alloc.deallocate(node, 1);
+					return tmp;
+				}
+				node->value = node->left->getMax()->value;
+				node->left = remove(node->value, node->left);
+				// tmp = node;
+				// node = node->left->getMax();
+				// node->left = tmp->left;
+				// node->right = tmp->right;
+				// node->left->getMaxParent()->right = nullptr;
+				// _alloc.destroy(tmp);
+				// _alloc.deallocate(tmp, 1);
+			}
+			node->updateHeight();
+			return applyRotation(node);
+		}
+
 	public:
 		avl_tree(Alloc alloc = Alloc()): _root(nullptr), _alloc(alloc) {}
 
-		void	print_l_to_r(node<T> *n)
+		void print_tree(const std::string& prefix, node_type* node, bool isLeft)
 		{
-			if (n->left)
-				print_l_to_r(n->left);
-			std::cout << n->value << ", ";
-			if (n->right)
-				print_l_to_r(n->right);
-		}
-		void	print_l_to_r() { print_l_to_r(_root); }
-		void	insert(T value, node<T> *n)
-		{
-			if (n->value < value)
-			{
-				if (n->right == nullptr)
-				{
-					n->right = _alloc.allocate(1);
-					_alloc.construct(n->right, node<T>(value, n));
-					n->recalcWeight();
-					return ;
-				}
-				insert(value, n->right);
-			}
-			else
-			{
-				if (n->left == nullptr)
-				{
-					n->left = _alloc.allocate(1);
-					_alloc.construct(n->left, node<T>(value, n));
-					n->recalcWeight();
-					return ;
-				}
-				insert(value, n->left);
-			}
-			n->recalcWeight();
-			if (n->weight() > 1)
-			{	// rotate left
-				node<T>	*A = n;
-				node<T>	*B = n->right;
-				node<T>	*D = n->right->left;
+		    if( node != nullptr )
+		    {
+		        std::cout << prefix;
 
-				A->right = D;
-				A->left = A;
-				A = B;
-			}
-			if (n->weight() < -1)
-			{	// rotate right
-				node<T>	*A = n;
-				node<T>	*B = n->left;
-				node<T>	*D = n->left->right;
-
-				A->left = D;
-				A->right = A;
-				A = B;
-			}
+		        std::cout << (isLeft ? "├─>" : "└─>" );
+		        std::cout << node->value << std::endl;
+		        print_tree( prefix + (isLeft ? "│   " : "    "), node->left, true);
+		        print_tree( prefix + (isLeft ? "│   " : "    "), node->right, false);
+		    }
 		}
-		void	insert(T value)
-		{
-			if (_root == nullptr)
-			{
-				_root = (node<T> *) _alloc.allocate(sizeof(node<T>));
-				_alloc.construct(_root, node<T>(value));
-				return ;
-			}
-			insert(value, _root);
-		}
+		void	print_tree()	{ print_tree("", _root, false); }
+		void	insert(T value) { _root = insert(value, _root); }
+		void	remove(T value) { _root = remove(value, _root); }
+		bool	isEmpty(void)	{ return _root == nullptr; }
 	};
 }

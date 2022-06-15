@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./iterator_utils.hpp"
+#include "iterator_utils.hpp"
 
 namespace ft
 {
@@ -78,45 +78,33 @@ namespace ft
 namespace ft {
 	template <typename T, typename Container>
 	bool operator==(const ft::vector_iterator<T, Container> &rhs,		const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() == rhs.base()); }
-	template <typename T, typename Container>
-	bool operator==(const ft::vector_iterator<const T, Container> &rhs, const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() == rhs.base()); }
-	template <typename T, typename Container>
-	bool operator==(const ft::vector_iterator<T, Container> &rhs,		const ft::vector_iterator<const T, Container> &lhs)	{ return (lhs.base() == rhs.base()); }
+	template <typename U, typename V, typename Container>
+	bool operator==(const ft::vector_iterator<U, Container> &rhs, const ft::vector_iterator<V, Container> &lhs)		{ return (lhs.base() == rhs.base()); }
 
 	template <typename T, typename Container>
 	bool operator!=(const ft::vector_iterator<T, Container> &rhs,		const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() != rhs.base()); }
-	template <typename T, typename Container>
-	bool operator!=(const ft::vector_iterator<const T, Container> &rhs, const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() != rhs.base()); }
-	template <typename T, typename Container>
-	bool operator!=(const ft::vector_iterator<T, Container> &rhs,		const ft::vector_iterator<const T, Container> &lhs)	{ return (lhs.base() != rhs.base()); }
-	
+	template <typename U, typename V, typename Container>
+	bool operator!=(const ft::vector_iterator<U, Container> &rhs, const ft::vector_iterator<V, Container> &lhs)		{ return (lhs.base() != rhs.base()); }
+
 	template <typename T, typename Container>
 	bool operator>=(const ft::vector_iterator<T, Container> &rhs,		const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() <= rhs.base()); }
-	template <typename T, typename Container>
-	bool operator>=(const ft::vector_iterator<const T, Container> &rhs, const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() <= rhs.base()); }
-	template <typename T, typename Container>
-	bool operator>=(const ft::vector_iterator<T, Container> &rhs,		const ft::vector_iterator<const T, Container> &lhs)	{ return (lhs.base() <= rhs.base()); }
+	template <typename U, typename V, typename Container>
+	bool operator>=(const ft::vector_iterator<U, Container> &rhs, const ft::vector_iterator<V, Container> &lhs)		{ return (lhs.base() <= rhs.base()); }
 
 	template <typename T, typename Container>
 	bool operator<=(const ft::vector_iterator<T, Container> &rhs, 		const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() >= rhs.base()); }
-	template <typename T, typename Container>
-	bool operator<=(const ft::vector_iterator<const T, Container> &rhs,	const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() >= rhs.base()); }
-	template <typename T, typename Container>
-	bool operator<=(const ft::vector_iterator<T, Container> &rhs,		const ft::vector_iterator<const T, Container> &lhs)	{ return (lhs.base() >= rhs.base()); }
+	template <typename U, typename V, typename Container>
+	bool operator<=(const ft::vector_iterator<U, Container> &rhs,	const ft::vector_iterator<V, Container> &lhs)		{ return (lhs.base() >= rhs.base()); }
 
 	template <typename T, typename Container>
 	bool operator>(const ft::vector_iterator<T, Container> &rhs,		const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() < rhs.base()); }
-	template <typename T, typename Container>
-	bool operator>(const ft::vector_iterator<const T, Container> &rhs,	const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() < rhs.base()); }
-	template <typename T, typename Container>
-	bool operator>(const ft::vector_iterator<T, Container> &rhs,		const ft::vector_iterator<const T, Container> &lhs)	{ return (lhs.base() < rhs.base()); }
+	template <typename U, typename V, typename Container>
+	bool operator>(const ft::vector_iterator<U, Container> &rhs,	const ft::vector_iterator<V, Container> &lhs)		{ return (lhs.base() < rhs.base()); }
 
 	template <typename T, typename Container>
 	bool operator<(const ft::vector_iterator<T, Container> &rhs, 		const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() > rhs.base()); }
-	template <typename T, typename Container>
-	bool operator<(const ft::vector_iterator<const T, Container> &rhs,	const ft::vector_iterator<T, Container> &lhs)		{ return (lhs.base() > rhs.base()); }
-	template <typename T, typename Container>
-	bool operator<(const ft::vector_iterator<T, Container> &rhs,		const ft::vector_iterator<const T, Container> &lhs)	{ return (lhs.base() > rhs.base()); }
+	template <typename U, typename V, typename Container>
+	bool operator<(const ft::vector_iterator<U, Container> &rhs,	const ft::vector_iterator<V, Container> &lhs)		{ return (lhs.base() > rhs.base()); }
 
 	template <typename T, typename Container>
 	ft::vector_iterator<T, Container> operator+(typename ft::vector_iterator<T, Container>::difference_type rhs, const ft::vector_iterator<T, Container> &lhs)						{ return (lhs.base() + rhs); }
@@ -129,8 +117,6 @@ namespace ft {
 
 	template <typename T, typename Container>
 	typename ft::vector_iterator<T, Container>::difference_type operator-(const ft::vector_iterator<T, Container> &rhs, const ft::vector_iterator<T, Container> &lhs)				{ return (rhs.base() - lhs.base()); }
-	template <typename T, typename Container>
-	typename ft::vector_iterator<const T, Container>::difference_type operator-(const ft::vector_iterator<const T, Container> &rhs, const ft::vector_iterator<T, Container> &lhs)	{ return (rhs.base() - lhs.base()); }
-	template <typename T, typename Container>
-	typename ft::vector_iterator<const T, Container>::difference_type operator-(const ft::vector_iterator<T, Container> &rhs, const ft::vector_iterator<const T, Container> &lhs)	{ return (rhs.base() - lhs.base()); }
+	template <typename U, typename V, typename Container>
+	typename ft::vector_iterator<U, Container>::difference_type operator-(const ft::vector_iterator<V, Container> &rhs, const ft::vector_iterator<U, Container> &lhs)	{ return (rhs.base() - lhs.base()); }
 }

@@ -6,7 +6,7 @@
 /*   By: kbarbry <kbarbry@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/11 10:11:06 by kbarbry           #+#    #+#             */
-/*   Updated: 2022/06/14 15:21:25 by kbarbry          ###   ########.fr       */
+/*   Updated: 2022/06/15 12:33:54 by kbarbry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,10 @@
 #include <memory>
 #include <iostream>
 #include <algorithm>
-#include "ft_containers.hpp"
+
+#include "reverse_iterator.hpp"
+#include "vector_iterator.hpp"
+#include "utils.hpp"
 
 namespace ft {
 	template<class T, class Alloc = std::allocator<T> >
