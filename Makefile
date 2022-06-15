@@ -12,7 +12,7 @@ HEADER		=	$(shell find ./inc -type f -name "*.hpp" | cut -c 3-)
 OBJ			=	${SRC:.cpp=.o}
 
 CC			=	c++
-FLAGS		=	-Wall -Werror -Wextra -std=c++98
+FLAGS		=	-Wall -Werror -Wextra
 FLAGS_H		=	-Iinc/
 NAME		=	ft_containers
 

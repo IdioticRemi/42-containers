@@ -1,10 +1,12 @@
 #pragma once
 
 #include "utils.hpp"
-
 #include "iterator_utils.hpp"
+
 #include "reverse_iterator.hpp"
 #include "vector_iterator.hpp"
+
+#include "avl_tree.hpp"
 
 #include "map.hpp"
 #include "pair.hpp"
