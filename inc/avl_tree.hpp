@@ -6,6 +6,8 @@
 #include <cmath>
 #include <iomanip>
 
+#include "avl_iterator.hpp"
+
 template <typename T>
 class node
 {
@@ -36,7 +38,9 @@ namespace ft
 	class avl_tree
 	{
 	public:
-		typedef	node<T>		node_type;
+		typedef	node<T>									node_type;
+		typedef ft::avl_iterator<Node, Compare>			iterator;
+		typedef ft::avl_iterator<const Node, Compare>	const_iterator;
 
 	private:
 		node_type	*_root;

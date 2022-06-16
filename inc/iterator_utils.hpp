@@ -1,6 +1,5 @@
 #pragma once
 
-
 namespace ft
 {
 	class output_iterator_tag {};
