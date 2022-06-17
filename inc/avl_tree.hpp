@@ -6,23 +6,23 @@
 #include <cmath>
 #include <iomanip>
 
-#include "avl_iterator.hpp"
+#include "map_iterator.hpp"
 
 template <typename T>
-class node
+class Node
 {
 private:
 	ssize_t	_height;
 
 public:
 	T		value;
-	node	*left;
-	node	*right;
+	Node	*left;
+	Node	*right;
 
-	node(T value): value(value), left(nullptr), right(nullptr), _height(1) {}
+	Node(T value): value(value), left(nullptr), right(nullptr), _height(1) {}
 
-	node	*getMax() { return (right ? right->getMax() : this); }
-	node	*getMaxParent() { return ((right && right->right) ? right->getMaxParent() : this); }
+	Node	*getMax() { return (right ? right->getMax() : this); }
+	Node	*getMaxParent() { return ((right && right->right) ? right->getMaxParent() : this); }
 	void	updateHeight()
 	{
 		_height = 1 + std::max( (right	?	right->height()	: 0),
@@ -34,17 +34,39 @@ public:
 
 namespace ft
 {
-	template <typename T, typename Compare, typename Alloc = std::allocator<node<T> > >
+	template <typename T, typename Compare, typename Alloc = std::allocator<Node<T> > >
 	class avl_tree
 	{
 	public:
-		typedef	node<T>									node_type;
-		typedef ft::avl_iterator<Node, Compare>			iterator;
-		typedef ft::avl_iterator<const Node, Compare>	const_iterator;
+		typedef	Node<T>										node_type;
+
+		void print_tree(const std::string &prefix, node_type *node, bool isLeft) const
+		{
+		    if ( node != nullptr )
+		    {
+		        std::cout << prefix;
+
+		        std::cout << (isLeft ? "├─>" : "└─>" );
+		        std::cout << node->value << std::endl;
+		        print_tree( prefix + (isLeft ? "│   " : "    "), node->left, true);
+		        print_tree( prefix + (isLeft ? "│   " : "    "), node->right, false);
+		    }
+		}
+
+		avl_tree(Alloc alloc = Alloc()): _root(nullptr), _alloc(alloc), _size(0) {}
+		~avl_tree(void)					{ clear_tree(_root); }
+
+		void		insert(T value)				{ _root = insert(value, _root); }
+		void		remove(T value)				{ _root = remove(value, _root); }
+		void		print_tree(void) 	const	{ print_tree("", _root, false); }
+		bool		isEmpty(void) 		const	{ return _root == nullptr; }
+		size_t		getSize(void)		const	{ return _size; }
+		node_type	*getRoot(void) 		const	{ return _root; }
 
 	private:
 		node_type	*_root;
 		Alloc		_alloc;
+		size_t		_size;
 
 		node_type	*insert(T value, node_type *node)
 		{
@@ -52,6 +74,7 @@ namespace ft
 			{
 				node_type *new_node = _alloc.allocate(1);
 				_alloc.construct(new_node, node_type(value));
+				_size++;
 				return new_node;
 			}
 			if (node->value < value)
@@ -122,6 +145,7 @@ namespace ft
 					tmp = node->right;
 					_alloc.destroy(node);
 					_alloc.deallocate(node, 1);
+					_size--;
 					return tmp;
 				}
 				else if (node->right == nullptr)
@@ -129,6 +153,7 @@ namespace ft
 					tmp = node->left;
 					_alloc.destroy(node);
 					_alloc.deallocate(node, 1);
+					_size--;
 					return tmp;
 				}
 				node->value = node->left->getMax()->value;
@@ -144,25 +169,15 @@ namespace ft
 			node->updateHeight();
 			return applyRotation(node);
 		}
-
-	public:
-		avl_tree(Alloc alloc = Alloc()): _root(nullptr), _alloc(alloc) {}
-
-		void print_tree(const std::string& prefix, node_type* node, bool isLeft)
+		void	clear_tree(node_type *node)
 		{
-		    if( node != nullptr )
-		    {
-		        std::cout << prefix;
-
-		        std::cout << (isLeft ? "├─>" : "└─>" );
-		        std::cout << node->value << std::endl;
-		        print_tree( prefix + (isLeft ? "│   " : "    "), node->left, true);
-		        print_tree( prefix + (isLeft ? "│   " : "    "), node->right, false);
-		    }
+			if (node == nullptr)
+				return ;
+			clear_tree(node->left);
+			clear_tree(node->right);
+			_alloc.destroy(node);
+			_alloc.deallocate(node, 1);
+			_size = 0;
 		}
-		void	print_tree()	{ print_tree("", _root, false); }
-		void	insert(T value) { _root = insert(value, _root); }
-		void	remove(T value) { _root = remove(value, _root); }
-		bool	isEmpty(void)	{ return _root == nullptr; }
 	};
 }

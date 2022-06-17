@@ -17,7 +17,7 @@ namespace ft
 		vector_iterator(): _addr(nullptr) {}
 		vector_iterator(T *addr): _addr(addr) {}
 		template <typename U>
-		vector_iterator(const vector_iterator<U, Container> &rhs): _addr(rhs.base()) {}
+		vector_iterator(const vector_iterator<U, Container> &cpy): _addr(cpy.base()) {}
 		~vector_iterator() {}
 
 		pointer base() const { return (_addr); }
