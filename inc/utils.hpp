@@ -114,4 +114,22 @@ namespace ft
 		enum { value = 1 };
 		typedef std::true_type type;
 	};
+
+	template <class Arg1, class Arg2, class Result>
+	struct compare_fct
+	{
+		/* The first argument type */
+		typedef Arg1 first_argument_type;
+
+		/* The second arguement type */
+		typedef Arg2 second_argument_type;
+
+		/* The result type */
+		typedef Result result_type;
+	};
+	template <class T>
+	struct less: compare_fct<T, T, bool>
+	{
+		bool operator() (const T& x, const T& y) const { return (x < y); }
+	};
 }

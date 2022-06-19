@@ -9,14 +9,14 @@ RST			=	\033[0m
 SRC			=	$(shell find ./src -type f -name "*.cpp" | cut -c 3-)
 HEADER		=	$(shell find ./inc -type f -name "*.hpp" | cut -c 3-)
 
-OBJ			=	${SRC:.cpp=.o}
+OBJ			=	$(SRC:.cpp=.o)
 
 CC			=	c++
 FLAGS		=	-Wall -Werror -Wextra
 FLAGS_H		=	-Iinc/
 NAME		=	ft_containers
 
-all: ${NAME}
+all: $(NAME)
 .PHONY: all
 
 print_header:
@@ -32,25 +32,25 @@ print_header:
 	echo "\033[1;34m\033[5G=======================================> By kbarbry ft tjolivea <======================================="
 .PHONY: print_header
 
-%.o: %.cpp ${HEADER}
-	${CC} ${FLAGS} ${FLAGS_H} -c $< -o $@
-	echo "${BBLU}[${NAME} OBJ] :${RST} $@ ${BGREEN}\033[47G[✔]${RST}"
+%.o: %.cpp $(HEADER)
+	$(CC) $(FLAGS) $(FLAGS_H) -c $< -o $@
+	echo "$(BBLU)[$(NAME) OBJ] :$(RST) $@ $(BGREEN)\033[47G[✔]$(RST)"
 
-${NAME}: print_header ${OBJ}
-	${CC} ${FLAGS} ${FLAGS_H} ${OBJ} -o ${NAME}
-	echo "${BGREEN}[${NAME} END] :${RST}${RST} ./${NAME} ${BGREEN}\033[47G[✔]${RST}"
+$(NAME): print_header $(OBJ)
+	$(CC) $(FLAGS) $(FLAGS_H) $(OBJ) -o $(NAME)
+	echo "$(BGREEN)[$(NAME) END] :$(RST)$(RST) ./$(NAME) $(BGREEN)\033[47G[✔]$(RST)"
 
 test: all
-	./${NAME}
+	./$(NAME)
 
 clean:
-	rm -f ${OBJ}
-	echo "${RED}[CLEAN]  :${RST} Deleting objects...${BGREEN}\033[47G[✔]${RST}"
+	rm -f $(OBJ)
+	echo "$(RED)[CLEAN]  :$(RST) Deleting objects...$(BGREEN)\033[47G[✔]$(RST)"
 .PHONY: clean
 
 fclean: clean
-	rm -f ${NAME}
-	echo "${RED}[FCLEAN] :${RST} Deleting executable...${BGREEN}\033[47G[✔]${RST}"
+	rm -f $(NAME)
+	echo "$(RED)[FCLEAN] :$(RST) Deleting executable...$(BGREEN)\033[47G[✔]$(RST)"
 .PHONY: fclean
 
 re:	fclean all
