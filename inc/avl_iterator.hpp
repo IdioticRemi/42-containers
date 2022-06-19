@@ -5,7 +5,7 @@
 
 namespace ft
 {
-	template <typename T, class Compare >
+	template <typename T>
 	class avl_iterator : ft::iterator<ft::bidirectional_iterator_tag, T>
 	{
 	public :
@@ -15,54 +15,48 @@ namespace ft
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::pointer				pointer;
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::reference			reference;
 
-		avl_iterator(const Compare& comp = Compare()): _node(), _last_node(), _comp(comp) {}
-		avl_iterator(T * node_p, T * last_node, const Compare& comp = Compare()): _node(node_p), _last_node(last_node), _comp(comp) {}
-		template <typename U, typename CompareOther>
-		avl_iterator(const avl_iterator<U, CompareOther>& avl_it): _node(avl_it._node), _last_node(avl_it._last_node), _comp() {}
+		avl_iterator(): _node(), _first_node(), _last_node() {}
+		avl_iterator(T *node, T *first_node, T *last_node): _node(node), _first_node(first_node), _last_node(last_node) { if (_node == _last_node) _node = nullptr; }
+		template <typename U>
+		avl_iterator(const avl_iterator<U> &avl_it): _node(avl_it._node), _first_node(avl_it._last_node), _last_node(avl_it._last_node) {}
 		~avl_iterator() {}
 
-		avl_iterator &operator=(const avl_iterator &avl_it)
+		avl_iterator &operator=(const avl_iterator &src)
 		{
-			if (*this == avl_it)
-				return (*this);
-			this->_node = avl_it._node;
-			this->_last_node = avl_it._last_node;
-			this->_comp = avl_it._comp;
+			this->_node = src._node;
+			this->_first_node = src._first_node;
+			this->_last_node = src._last_node;
 			return (*this);
 		}
-		reference	operator*()		const			{ return (this->_node->value); }
-		pointer		operator->()	const			{ return (&this->_node->value); }
+		reference	operator*()		const			{ return this->_node->value; }
+		pointer		operator->()	const			{ return &this->operator*(); }
 
 		avl_iterator &operator++(void)
 		{
-			T* cursor = _node;
+			T	*tmp;
 
 			if (!_node)
 				return *this;
-			if (_node->right == _last_node)
+			if (!_node->right)
 			{
-				cursor = _node->parent;
-				while (cursor != _last_node
-					   && _comp(cursor->value.first, _node->value.first))
-					cursor = cursor->parent;
-				_node = cursor;
-			}
-			else if (cursor == _last_node)
-				_node = _last_node->right;
-			else
-			{
-				cursor = _node->right;
-				if (cursor == _last_node->parent
-					&& cursor->right == _last_node)
-					_node = cursor;
-				else
+				if (_node == _last_node)
 				{
-					while (cursor->left != _last_node)
-						cursor = cursor->left;
+					_node = nullptr;
+					return *this;
 				}
-				_node = cursor;
+				tmp = _node;
+				_node = _node->parent;
+				while (_node->right && tmp == _node->right)
+				{
+					tmp = _node;
+					_node = _node->parent;
+				}
+				return *this;
 			}
-			return (*this);
+			_node = _node->right;
+			while (_node->left)
+				_node = _node->left;
+			return *this;
 		}
 		avl_iterator operator++(int)
 		{
@@ -72,32 +66,30 @@ namespace ft
 		}
 		avl_iterator &operator--(void)
 		{
-			T* cursor = _node;
+			T	*tmp;
 
-			if (_node->left == _last_node)
+			if (!_node)
+				return *this;
+			if (!_node->left)
 			{
-				cursor = _node->parent;
-				while (cursor != _last_node
-					   && !_comp(cursor->value.first, _node->value.first))
-					cursor = cursor->parent;
-				_node = cursor;
-			}
-			else if (cursor == _last_node)
-				_node = _last_node->right;
-			else
-			{
-				cursor = _node->left;
-				if (cursor == _last_node->parent
-					&& cursor->left == _last_node)
-					_node = cursor;
-				else
+				if (_node == _first_node)
 				{
-					while (cursor->right != _last_node)
-						cursor = cursor->right;
+					_node = nullptr;
+					return *this;
 				}
-				_node = cursor;
+				tmp = _node;
+				_node = _node->parent;
+				while (_node->left && tmp == _node->left)
+				{
+					tmp = _node;
+					_node = _node->parent;
+				}
+				return *this;
 			}
-			return (*this);
+			_node = _node->left;
+			while (_node->right)
+				_node = _node->right;
+			return *this;
 		}
 		avl_iterator operator--(int)
 		{
@@ -107,19 +99,19 @@ namespace ft
 		}
 
 		T			*_node;
+		T			*_first_node;
 		T			*_last_node;
-		Compare     _comp;
 	};
 }
 
 namespace ft {
-	template <typename T, typename Compare>
-	bool operator==(const ft::avl_iterator<T, Compare> &rhs,	const ft::avl_iterator<T, Compare> &lhs)	{ return rhs._node == lhs._node; }
-	template <typename U, typename V, typename Compare>
-	bool operator==(const ft::avl_iterator<U, Compare> &rhs, const ft::avl_iterator<V, Compare> &lhs)		{ return rhs._node == lhs._node; }
+	template <typename T>
+	bool operator==(const ft::avl_iterator<T> &rhs,	const ft::avl_iterator<T> &lhs)		{ return rhs._node == lhs._node; }
+	template <typename U, typename V>
+	bool operator==(const ft::avl_iterator<U> &rhs, const ft::avl_iterator<V> &lhs)		{ return rhs._node == lhs._node; }
 
-	template <typename T, typename Compare>
-	bool operator!=(const ft::avl_iterator<T, Compare> &rhs,	const ft::avl_iterator<T, Compare> &lhs)	{ return rhs._node != lhs._node; }
-	template <typename U, typename V, typename Compare>
-	bool operator!=(const ft::avl_iterator<U, Compare> &rhs, const ft::avl_iterator<V, Compare> &lhs)		{ return rhs._node = lhs._node; }
+	template <typename T>
+	bool operator!=(const ft::avl_iterator<T> &rhs,	const ft::avl_iterator<T> &lhs)		{ return rhs._node != lhs._node; }
+	template <typename U, typename V>
+	bool operator!=(const ft::avl_iterator<U> &rhs, const ft::avl_iterator<V> &lhs)		{ return rhs._node = lhs._node; }
 }
