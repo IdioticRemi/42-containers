@@ -51,13 +51,13 @@ namespace ft
 			reverse_iterator<Iter> cpy(_iter++);
 			return (cpy);
 		}
-		reference operator*(void)
+		reference operator*(void) const
 		{
 			Iter cpy(_iter);
 			--cpy;
 			return (*cpy);
 		}
-		pointer operator->(void)
+		pointer operator->(void) const
 		{
 			Iter cpy(_iter);
 			--cpy;

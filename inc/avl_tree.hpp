@@ -36,52 +36,82 @@ namespace ft
 	class avl_tree
 	{
 	public :
-		typedef ft::pair<U, V>										value_type;
-		typedef Node												node_type;
-		typedef Node												*node_pointer;
-		typedef Node_Alloc											node_alloc;
-		typedef ft::avl_iterator<Node>								iterator;
-		typedef ft::avl_iterator<Node>								const_iterator;
-		typedef typename node_alloc::size_type						size_type;
+		typedef ft::pair<U, V>					value_type;
+		typedef Node							node_type;
+		typedef Node							*node_pointer;
+		typedef Node_Alloc						node_alloc;
+		typedef ft::avl_iterator<Node>			iterator;
+		typedef ft::avl_iterator<Node>			const_iterator;
+		typedef typename node_alloc::size_type	size_type;
+
+		node_pointer	_root;
+		node_alloc 		_alloc;
+		size_t			_size;
 
 		avl_tree(const node_alloc& _node_alloc = node_alloc()) : _root(nullptr), _alloc(_node_alloc), _size(0)	{}
 
-		~avl_tree(void)	{ clear_tree(_root); }
+		~avl_tree(void)	{ clear_tree(); }
 
-		void		insert(value_type value)	{ _root = insert(value, _root); reset_parents(); }
-		void		remove(value_type value)	{ _root = remove(value, _root); reset_parents(); }
-		bool		isEmpty(void) 		const	{ return _root == nullptr; }
-		size_type	getSize(void)		const	{ return _size; }
-		size_type	max_size(void)		const	{ return _alloc.max_size(); }
-		node_type	*find(value_type value)		{ return find(value, _root); }
-		node_type	*getRoot(void) 		const	{ return _root; }
+		void			clear_tree()					{ clear_tree(_root); _size = 0; _root = nullptr; }
+		void			insert(value_type value)		{ _root = insert(value, _root); reset_parents(); }
+		void			remove(value_type value)		{ _root = remove(value, _root); reset_parents(); }
+		bool			isEmpty(void) 			const	{ return _root == nullptr; }
+		size_type		getSize(void)			const	{ return _size; }
+		size_type		max_size(void)			const	{ return _alloc.max_size(); }
+		node_pointer	find(value_type value)	const	{ return find(value, _root); }
+		node_pointer	getRoot(void) 			const	{ return _root; }
 
-		iterator begin()						{ return _root ? iterator(_root->getMin(), _root->getMin(), _root->getMax()) : iterator(); }
-		const_iterator begin()			const	{ return _root ? const_iterator(_root->getMin(), _root->getMin(), _root->getMax()) : const_iterator(); }
+		iterator begin()								{ return _root ? iterator(_root->getMin(), _root->getMin(), _root->getMax()) : iterator(); }
+		const_iterator begin()					const	{ return _root ? const_iterator(_root->getMin(), _root->getMin(), _root->getMax()) : const_iterator(); }
 
-		iterator end()							{ return _root ? iterator(_root->getMax(), _root->getMin(), _root->getMax()) : iterator(); }
-		const_iterator end()			const	{ return _root ? const_iterator(_root->getMax(), _root->getMin(), _root->getMax()) : const_iterator(); }
+		iterator end()									{ return _root ? iterator(nullptr, _root->getMin(), _root->getMax()) : iterator(); }
+		const_iterator end()					const	{ return _root ? const_iterator(nullptr, _root->getMin(), _root->getMax()) : const_iterator(); }
+		
+		// void print_tree(const std::string& prefix, node_type* node, bool isLeft)
+		// {
+		//     if( node != nullptr )
+		//     {
+		//         std::cout << prefix;
+
+		//         std::cout << (isLeft ? "├─>" : "└─>" );
+		//         std::cout << "(" << node->value.first << ", " << node->value.second << ")" << std::endl;
+		//         print_tree( prefix + (isLeft ? "│   " : "    "), node->left, true);
+		//         print_tree( prefix + (isLeft ? "│   " : "    "), node->right, false);
+		//     }
+		// }
+		// void	print_tree()	{ print_tree("", _root, false); }
+
+		void	swap(avl_tree &x)
+		{
+			node_type *tmp = _root;
+			_root = x._root;
+			x._root = tmp;
+
+			node_alloc 	tmpa = _alloc;
+			_alloc = x._alloc;
+			x._alloc = tmpa;
+
+			size_t	tmps = _size;
+			_size = x._size;
+			x._size = tmps;
+		}
 	private:
-		node_type	*_root;
-		node_alloc 	_alloc;
-		size_t		_size;
 
-		node_type	*find(value_type value, node_type *node)
+		node_pointer	find(value_type value, node_type *node) const
 		{
 			if (node == nullptr)
 				return nullptr;
 			if (node->value.first < value.first)
 				return find(value, node->right);
-			else if (node->value.first > value.first)
+			if (node->value.first > value.first)
 				return find(value, node->left);
-			else
-				return node;
+			return node;
 		}
-		node_type	*insert(value_type value, node_type *node)
+		node_pointer	insert(value_type value, node_type *node)
 		{
 			if (node == nullptr)
 			{
-				node_type *new_node = _alloc.allocate(1);
+				node_pointer	new_node = _alloc.allocate(1);
 				_alloc.construct(new_node, node_type(value));
 				_size++;
 				return new_node;
@@ -96,7 +126,7 @@ namespace ft
 			return applyRotation(node);
 		}
 
-		node_type	*applyRotation(node_type *node)
+		node_pointer	applyRotation(node_type *node)
 		{
 			ssize_t	balanciaga = node->balance();
 			if (balanciaga > 1)
@@ -114,10 +144,10 @@ namespace ft
 			return node;
 		}
 
-		node_type	*left_rotation(node_type *node)
+		node_pointer	left_rotation(node_type *node)
 		{
-			node_type	*rightNode = node->right;
-			node_type	*centerNode = rightNode->left;
+			node_pointer	rightNode = node->right;
+			node_pointer	centerNode = rightNode->left;
 
 			rightNode->left = node;
 			node->right = centerNode;
@@ -125,10 +155,10 @@ namespace ft
 			rightNode->updateHeight();
 			return rightNode;
 		}
-		node_type	*right_rotation(node_type *node)
+		node_pointer	right_rotation(node_type *node)
 		{
-			node_type	*leftNode = node->left;
-			node_type	*centerNode = leftNode->right;
+			node_pointer	leftNode = node->left;
+			node_pointer	centerNode = leftNode->right;
 
 			leftNode->right = node;
 			node->left = centerNode;
@@ -137,7 +167,7 @@ namespace ft
 			return leftNode;
 		}
 
-		node_type	*remove(value_type value, node_type *node)
+		node_pointer	remove(value_type value, node_type *node)
 		{
 			if (node == nullptr)
 				return nullptr;
@@ -147,7 +177,7 @@ namespace ft
 				node->right = remove(value, node->right);
 			else
 			{
-				node_type	*tmp;
+				node_pointer	tmp;
 
 				if (node->left == nullptr)
 				{
@@ -173,6 +203,8 @@ namespace ft
 		}
 		void	reset_parents()
 		{
+			if (!_root)
+				return;
 			_root->parent = nullptr;
 			reset_parents(_root);
 		}
@@ -193,9 +225,9 @@ namespace ft
 				return ;
 			clear_tree(node->left);
 			clear_tree(node->right);
+		
 			_alloc.destroy(node);
 			_alloc.deallocate(node, 1);
-			_size = 0;
 		}
 	};
 };

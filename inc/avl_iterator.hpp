@@ -15,21 +15,24 @@ namespace ft
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::pointer				pointer;
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::reference			reference;
 
-		avl_iterator(): _node(), _first_node(), _last_node() {}
-		avl_iterator(T *node, T *first_node, T *last_node): _node(node), _first_node(first_node), _last_node(last_node) { if (_node == _last_node) _node = nullptr; }
+		avl_iterator(): _node(), _first_node(), _last_node(), _end(false) {}
+		avl_iterator(T *node, T *first_node, T *last_node): _node(node), _first_node(first_node), _last_node(last_node), _end(node == nullptr) {}
 		template <typename U>
-		avl_iterator(const avl_iterator<U> &avl_it): _node(avl_it._node), _first_node(avl_it._last_node), _last_node(avl_it._last_node) {}
+		avl_iterator(const avl_iterator<U> &avl_it): _node(avl_it._node), _first_node(avl_it._first_node), _last_node(avl_it._last_node), _end(avl_it._end == nullptr) {}
 		~avl_iterator() {}
 
 		avl_iterator &operator=(const avl_iterator &src)
 		{
-			this->_node = src._node;
-			this->_first_node = src._first_node;
-			this->_last_node = src._last_node;
+			_node = src._node;
+			_first_node = src._first_node;
+			_last_node = src._last_node;
+			_end = src._end;
 			return (*this);
 		}
-		reference	operator*()		const			{ return this->_node->value; }
-		pointer		operator->()	const			{ return &this->operator*(); }
+		reference	operator*()		const			{ return _node->value; }
+		pointer		operator->()	const			{ return &_node->value; }
+
+		pointer base() const { return &_node->value; }
 
 		avl_iterator &operator++(void)
 		{
@@ -41,6 +44,7 @@ namespace ft
 			{
 				if (_node == _last_node)
 				{
+					_end = true;
 					_node = nullptr;
 					return *this;
 				}
@@ -68,6 +72,12 @@ namespace ft
 		{
 			T	*tmp;
 
+			if (!_node && _end)
+			{
+				_node = _last_node;
+				_end = false;
+				return *this;
+			}
 			if (!_node)
 				return *this;
 			if (!_node->left)
@@ -101,6 +111,7 @@ namespace ft
 		T			*_node;
 		T			*_first_node;
 		T			*_last_node;
+		bool		_end;
 	};
 }
 
