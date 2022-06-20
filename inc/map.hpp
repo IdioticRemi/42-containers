@@ -40,16 +40,27 @@ namespace ft
 		typedef typename ft::iterator_traits<iterator>::difference_type 		difference_type;
 		typedef size_t															size_type;
 
-		map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()): _alloc(alloc), _comp(comp), _tree() {std::cout << "\033[1;31mDEFAULT CONSTRUCT\n"; }
+		map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+			: _alloc(alloc), _comp(comp), _tree()
+		{}
+
 		template <class Iter>
-		map (Iter first, Iter last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()): _alloc(alloc), _comp(comp), _tree() { std::cout << "\033[1;31mNORMAL CONSTRUCT\n"; insert(first, last); }
-		template <typename U, typename V>
-		map(const map<U, V> &cpy): _alloc(cpy._alloc), _comp(cpy._comp), _tree() { std::cout << "\033[1;31mCOPY CONSTRUCT\n"; insert(cpy.begin(), cpy.end()); }
+		map (Iter first, Iter last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+			: _alloc(alloc), _comp(comp), _tree()
+		{
+			insert(first, last);
+		}
+		
+		map(const map &cpy): _alloc(cpy._alloc), _comp(cpy._comp), _tree() { 
+			// std::cout << "\033[1;31mCOPY CONSTRUCT\033[0m\n" << std::endl; 
+			*this = cpy;
+		}
 
 		~map()	{ clear(); }
 
 		map &operator=(const map &cpy)
 		{
+			// std::cout << "\033[1;31mWTF\033[0m\n";
 			_tree.clear_tree();
 			insert(cpy.begin(), cpy.end());
 			return (*this);
@@ -188,10 +199,23 @@ namespace ft
 		ft::pair<const_iterator, const_iterator>	equal_range(const key_type &key)	const	{ return ft::make_pair(lower_bound(key), upper_bound(key)); }
 		ft::pair<iterator, iterator>				equal_range(const key_type &key)			{ return ft::make_pair(lower_bound(key), upper_bound(key)); }
 
-		avl_tree<key_type, mapped_type>	_tree;
+		friend void		swap(map &x, map &y) { x.swap(y); }
+		friend bool		operator==(const map &lhs, const map &rhs)
+		{
+			return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin());
+		}
+		friend bool		operator!=(const map &lhs, const map &rhs)	{ return !(lhs == rhs); }
+		friend bool 	operator<(const map &lhs, const map &rhs)
+		{
+			return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+		}	
+		friend bool		operator<=(const map &lhs, const map &rhs)	{ return !(lhs > rhs); }
+		friend bool		operator>(const map &lhs, const map &rhs)	{ return rhs < lhs; }
+		friend bool		operator>=(const map &lhs, const map &rhs)	{ return !(lhs < rhs); }
 	private:
 		allocator_type					_alloc;
 		key_compare						_comp;
+		avl_tree<key_type, mapped_type>	_tree;
 
 	};
 }

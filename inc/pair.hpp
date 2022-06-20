@@ -29,23 +29,23 @@ namespace ft
 		}
 		friend bool operator!=(const pair<U, V> &lhs, const pair<U, V> &rhs)
 		{
-			return (lhs.first != rhs.first || lhs.second != rhs.second);
+			return !(lhs == rhs);
 		}
 		friend bool operator<(const pair<U, V> &lhs, const pair<U, V> &rhs)
 		{
-			return (lhs.first < rhs.first && lhs.second < rhs.second);
+			return (lhs.first < rhs.first || (!(rhs.first < lhs.first) && lhs.second < rhs.second));
 		}
 		friend bool operator<=(const pair<U, V> &lhs, const pair<U, V> &rhs)
 		{
-			return (lhs.first <= rhs.first && lhs.second <= rhs.second);
+			return !(rhs < lhs);
 		}
 		friend bool operator>(const pair<U, V> &lhs, const pair<U, V> &rhs)
 		{
-			return (lhs.first > rhs.first && lhs.second > rhs.second);
+			return (rhs < lhs);
 		}
 		friend bool operator>=(const pair<U, V> &lhs, const pair<U, V> &rhs)
 		{
-			return (lhs.first >= rhs.first && lhs.second >= rhs.second);
+			return !(lhs < rhs);
 		}
 	};
 

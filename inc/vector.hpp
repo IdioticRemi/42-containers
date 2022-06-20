@@ -6,7 +6,7 @@
 /*   By: kbarbry <kbarbry@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/11 10:11:06 by kbarbry           #+#    #+#             */
-/*   Updated: 2022/06/20 15:58:11 by kbarbry          ###   ########.fr       */
+/*   Updated: 2022/06/20 18:51:09 by kbarbry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,13 +115,13 @@ namespace ft {
 			reference		at(size_type n)
 			{
 				if (n >= _len || n < 0)
-					throw std::out_of_range("Index is out of range.");
+					throw std::out_of_range("index out of range.");
 				return _addr[n];
 			}
 			const_reference at(size_type n) const
 			{
 				if (n >= _len || n < 0)
-					throw std::out_of_range("Index is out of range.");
+					throw std::out_of_range("index out of range.");
 				return _addr[n];
 			}
 			allocator_type	get_allocator(void)	const	{ return _alloc; }
